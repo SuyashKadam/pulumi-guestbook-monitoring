@@ -115,6 +115,7 @@ Outputs:
     frontendUrl         : "http://localhost:8080"
     grafanaAdminPassword: [secret]
     grafanaAdminUser    : "admin"
+    grafanaNodePort     : 3xxxx
     grafanaPortForward  : "kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80"
     grafanaUrl          : "http://localhost:3000"
     prometheusService   : "monitoring/monitoring-kube-prometheus-prometheus"

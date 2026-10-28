@@ -24,5 +24,6 @@ export const grafanaAdminPassword = monitoring.grafanaAdminPassword; // `pulumi 
 export const prometheusService = monitoring.prometheusService;
 
 // On minikube there is no external load balancer: these are the commands that make the URLs above work.
+export const grafanaNodePort = isMinikube ? monitoring.grafanaNodePort : undefined;
 export const grafanaPortForward = isMinikube ? "kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80" : undefined;
 export const frontendPortForward = isMinikube ? "kubectl -n guestbook port-forward svc/frontend 8080:80" : undefined;

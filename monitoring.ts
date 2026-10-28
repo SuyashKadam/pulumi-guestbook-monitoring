@@ -99,6 +99,7 @@ export function deployMonitoring(args: MonitoringArgs) {
         grafanaUrl,
         grafanaAdminUser,
         grafanaAdminPassword: grafanaAdminPassword.result, // secret output
+        grafanaNodePort: grafanaService.spec.ports.apply(ports => ports[0].nodePort),
         prometheusService: pulumi.interpolate`${stack.status.namespace}/${stack.status.name}-kube-prometheus-prometheus`,
     };
 }

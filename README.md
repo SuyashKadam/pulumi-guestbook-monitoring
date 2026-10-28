@@ -65,7 +65,7 @@ A few things worth pointing out:
 - **Prometheus scrapes the frontend and backend:** ServiceMonitors in `monitoring.ts`, plus exporters and metrics services in `guestbook.ts`.
 - **Simple metrics:** request count (`apache_accesses_total`), Redis commands (`redis_commands_processed_total`), and pod CPU/memory.
 - **Grafana exposed as NodePort/LoadBalancer:** NodePort on minikube (the default), LoadBalancer with `isMinikube=false`.
-- **Grafana URL and admin credentials as Pulumi outputs:** `grafanaUrl`, `grafanaAdminUser` and `grafanaAdminPassword` (secret).
+- **Grafana URL and admin credentials as Pulumi outputs:** `grafanaUrl`, `grafanaNodePort`, `grafanaAdminUser` and `grafanaAdminPassword` (secret).
 - **Stretch goal, Grafana dashboard:** `dashboards/guestbook.json`, which shows up as "Guestbook Application".
 
 ## Prerequisites
@@ -101,14 +101,22 @@ pulumi stack output grafanaAdminUser                      # admin
 pulumi stack output grafanaAdminPassword --show-secrets
 ```
 
-Grafana is a NodePort service. On minikube I find a port-forward the easiest way in. The command is also in the
-`grafanaPortForward` output:
+Grafana is exposed as a NodePort service (`kubectl -n monitoring get svc monitoring-grafana` shows `TYPE NodePort`).
+The node port is in the `grafanaNodePort` output, so the direct NodePort URL is:
+
+```bash
+echo "http://$(minikube ip):$(pulumi stack output grafanaNodePort)"
+minikube service -n monitoring monitoring-grafana --url    # same thing, worked out by minikube
+```
+
+That URL works from the Linux host. With the Docker driver on WSL2, the minikube IP isn't reachable from a Windows
+browser, so I mostly used a port-forward instead. The command is also in the `grafanaPortForward` output:
 
 ```bash
 kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80
 ```
 
-Then open http://localhost:3000 and log in as `admin` with the password above. The password is different for every
+Then open http://localhost:3000 (the `grafanaUrl` output) and log in as `admin` with the password above. The password is different for every
 deployment, so it's not written down anywhere in this repo.
 
 The guestbook itself works the same way: run `kubectl -n guestbook port-forward svc/frontend 8080:80`, then go to http://localhost:8080.
