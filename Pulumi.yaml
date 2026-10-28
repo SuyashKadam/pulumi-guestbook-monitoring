@@ -1,0 +1,8 @@
+name: guestbook-monitoring
+runtime: nodejs
+description: Kubernetes Guestbook (Pulumi example) extended with Prometheus + Grafana monitoring
+config:
+  isMinikube:
+    type: boolean
+    default: true
+    description: true (default) for minikube/kind - Grafana is a NodePort, accessed via kubectl port-forward. Set to false on a cloud cluster (EKS/GKE/AKS) to get LoadBalancers
