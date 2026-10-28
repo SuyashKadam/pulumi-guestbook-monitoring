@@ -50,7 +50,7 @@ and adds monitoring to it. One `pulumi up` deploys:
                  │                            ▲                                                 │
                  │  Grafana (LoadBalancer :80) ── datasource "Prometheus"                       │
                  │     └─ dashboard sidecar loads ConfigMap "guestbook-dashboard"               │
-                 └──────────────────────────────────────────────────────────────────────────┘
+                 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 The diagram shows a cloud cluster. On minikube (the default) the frontend Service is `ClusterIP` and Grafana is `NodePort`,
 and both are opened with `kubectl port-forward`.
