@@ -68,9 +68,39 @@ A few things worth pointing out:
 - **Grafana URL and admin credentials as Pulumi outputs:** `grafanaUrl`, `grafanaNodePort`, `grafanaAdminUser` and `grafanaAdminPassword` (secret).
 - **Stretch goal, Grafana dashboard:** `dashboards/guestbook.json`, which shows up as "Guestbook Application".
 
+## Results
+
+Screenshots from my run on minikube are in [`screenshots/`](./screenshots).
+
+`pulumi up`: everything created in about 3 minutes, with the Grafana URL, NodePort and admin user as outputs
+(the password stays a secret):
+
+![pulumi up outputs](screenshots/01-pulumi-outputs.png)
+
+All guestbook pods are `2/2` (app + exporter sidecar), and the monitoring stack is up:
+
+![pods](screenshots/02-pods.png)
+
+The two ServiceMonitors, the metrics ports (9117/9121), and Grafana exposed as a NodePort:
+
+![servicemonitors and grafana service](screenshots/03-servicemonitors-and-grafana-svc.png)
+
+Prometheus scraping the frontend (3/3 up) and the backend (2/2 up):
+
+![frontend targets](screenshots/04a-prometheus-targets-frontend.png)
+![backend targets](screenshots/04b-prometheus-targets-backend.png)
+
+Request rate with the load generator running (~4-5 req/s):
+
+![request rate](screenshots/05-prometheus-request-rate.png)
+
+The Guestbook dashboard in Grafana:
+
+![grafana dashboard](screenshots/06-grafana-dashboard.png)
+
 ## Prerequisites
 
-- Linux with Docker and minikube (I used `--cpus=4 --memory=6144`)
+- Linux with Docker and minikube (I used `--cpus=4 --memory=6144 --kubernetes-version=v1.33.1`, see the note in SETUP.md)
 - kubectl
 - Pulumi CLI v3
 - Node.js 20 or newer. Ubuntu's own `nodejs` package is too old: the Pulumi SDK fails with
@@ -79,7 +109,7 @@ A few things worth pointing out:
 ## Deploy
 
 ```bash
-minikube start --driver=docker --cpus=4 --memory=6144   # add --force if you're root
+minikube start --driver=docker --cpus=4 --memory=6144 --kubernetes-version=v1.33.1   # add --force if you're root
 
 git clone https://github.com/SuyashKadam/pulumi-guestbook-monitoring.git
 cd pulumi-guestbook-monitoring

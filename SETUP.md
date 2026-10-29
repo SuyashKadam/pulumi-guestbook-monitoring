@@ -61,8 +61,12 @@ docker version && minikube version && kubectl version --client && pulumi version
 ## 2. Start minikube
 
 ```bash
-minikube start --driver=docker --cpus=4 --memory=6144
+minikube start --driver=docker --cpus=4 --memory=6144 --kubernetes-version=v1.33.1
 ```
+
+I pin Kubernetes to v1.33 on purpose. With minikube's default (v1.35) the API server never came up for me on WSL2
+(`K8S_APISERVER_MISSING`). Kubernetes 1.35 no longer runs on cgroup v1, which WSL2 often still uses. You can check
+with `stat -fc %T /sys/fs/cgroup/`: `tmpfs` means cgroup v1.
 
 If you're running as root (the default in a lot of WSL setups), minikube refuses the Docker driver unless you add
 `--force`. If your machine is short on memory, `--cpus=2 --memory=4096` also works, just more slowly.
@@ -107,7 +111,7 @@ The preview should list about 16 resources: two namespaces, the random password,
 4 services, 2 configmaps and 2 ServiceMonitors. There's also one read of the Grafana service, which Pulumi uses for the URL output.
 
 `pulumi up` spends most of its time waiting for the kube-prometheus-stack pods to become ready. For me it took about
-5 minutes the first time. At the end it prints:
+3-4 minutes the first time. At the end it prints:
 
 ```
 Outputs:
@@ -218,6 +222,8 @@ minikube delete
 ## Things that went wrong for me, or might for you
 
 - **`SyntaxError: Unexpected token '.'` on preview:** Node is too old. See step 1.
+- **`minikube start` fails with `K8S_APISERVER_MISSING`:** run `minikube delete`, then start again with
+  `--kubernetes-version=v1.33.1` (see step 2).
 - **`passphrase must be set`:** export `PULUMI_CONFIG_PASSPHRASE` again in this shell, with the same value.
 - **`ImagePullBackOff` with a 429 in `kubectl describe pod`:** you've hit Docker Hub's rate limit. Wait a bit and rerun
   `pulumi up`. Or run `docker login`, then `docker pull redis` and `minikube image load redis`, and do the same for the two
